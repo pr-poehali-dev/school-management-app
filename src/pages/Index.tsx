@@ -41,6 +41,20 @@ const mockStudentGrades = {
   "Английский": [5, 5, 5, 4, 5, 5, 5, 4],
 };
 
+const mockNotifications = [
+  { id: 1, type: "grade", title: "Новая оценка по Математике", description: "Оценка 5 за контрольную работу", date: "Сегодня, 14:30", isNew: true },
+  { id: 2, type: "event", title: "Родительское собрание", description: "15 декабря в 18:00, кабинет 201", date: "Вчера, 10:00", isNew: true },
+  { id: 3, type: "grade", title: "Новая оценка по Физике", description: "Оценка 4 за лабораторную работу", date: "27 ноября, 12:15", isNew: false },
+  { id: 4, type: "homework", title: "Домашнее задание по Русскому языку", description: "Упр. 234-236, сочинение", date: "26 ноября, 09:30", isNew: false },
+];
+
+const mockTeachers = [
+  { id: 1, name: "Иванова Елена Петровна", subject: "Математика", phone: "+7 (999) 123-45-67", email: "e.ivanova@school.ru" },
+  { id: 2, name: "Петров Сергей Иванович", subject: "Физика", phone: "+7 (999) 234-56-78", email: "s.petrov@school.ru" },
+  { id: 3, name: "Смирнова Ольга Дмитриевна", subject: "Русский язык", phone: "+7 (999) 345-67-89", email: "o.smirnova@school.ru" },
+  { id: 4, name: "Козлов Андрей Владимирович", subject: "История", phone: "+7 (999) 456-78-90", email: "a.kozlov@school.ru" },
+];
+
 const Index = () => {
   const [userRole, setUserRole] = useState<UserRole>(null);
   const [selectedSubject, setSelectedSubject] = useState("Математика");
@@ -453,6 +467,237 @@ const Index = () => {
               </div>
             </Card>
           </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (userRole === "parent") {
+    const calculateAverage = (grades: number[]) => {
+      const sum = grades.reduce((a, b) => a + b, 0);
+      return (sum / grades.length).toFixed(1);
+    };
+
+    return (
+      <div className="min-h-screen bg-background">
+        <header className="border-b bg-card shadow-sm sticky top-0 z-10">
+          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center">
+                <Icon name="UserCircle" size={24} className="text-accent-foreground" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold">Кабинет родителя</h1>
+                <p className="text-sm text-muted-foreground">Иванова Мария Сергеевна</p>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => setUserRole(null)}>
+              <Icon name="LogOut" size={20} />
+            </Button>
+          </div>
+        </header>
+
+        <main className="container mx-auto px-4 py-6 max-w-7xl">
+          <Tabs defaultValue="notifications" className="space-y-6">
+            <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3">
+              <TabsTrigger value="notifications">
+                <Icon name="Bell" size={18} className="mr-2" />
+                Уведомления
+              </TabsTrigger>
+              <TabsTrigger value="diary">
+                <Icon name="BookOpen" size={18} className="mr-2" />
+                Дневник
+              </TabsTrigger>
+              <TabsTrigger value="contacts">
+                <Icon name="Phone" size={18} className="mr-2" />
+                Контакты
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="notifications" className="space-y-4 animate-fade-in">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold">Уведомления</h2>
+                <Badge variant="default" className="bg-primary">
+                  {mockNotifications.filter(n => n.isNew).length} новых
+                </Badge>
+              </div>
+
+              <div className="grid gap-3">
+                {mockNotifications.map((notification, index) => (
+                  <Card
+                    key={notification.id}
+                    className={`p-4 hover:shadow-md transition-all animate-fade-in ${notification.isNew ? 'border-primary border-l-4' : ''}`}
+                    style={{ animationDelay: `${index * 50}ms` }}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
+                        notification.type === 'grade' ? 'bg-primary/10' :
+                        notification.type === 'event' ? 'bg-accent/10' : 'bg-secondary/10'
+                      }`}>
+                        <Icon
+                          name={notification.type === 'grade' ? 'Star' : notification.type === 'event' ? 'Calendar' : 'FileText'}
+                          size={20}
+                          className={
+                            notification.type === 'grade' ? 'text-primary' :
+                            notification.type === 'event' ? 'text-accent' : 'text-secondary'
+                          }
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-start justify-between mb-1">
+                          <h3 className="font-semibold">{notification.title}</h3>
+                          {notification.isNew && (
+                            <Badge variant="default" className="ml-2">Новое</Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-2">{notification.description}</p>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Icon name="Clock" size={12} />
+                          {notification.date}
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="diary" className="space-y-4 animate-fade-in">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold">Электронный дневник</h2>
+                <Badge variant="outline">Иванов Петр, 9А</Badge>
+              </div>
+
+              <div className="grid lg:grid-cols-2 gap-6">
+                <Card className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-bold">Успеваемость</h3>
+                    <Badge variant="outline">Текущий триместр</Badge>
+                  </div>
+
+                  <div className="space-y-4">
+                    {Object.entries(mockStudentGrades).map(([subject, grades], index) => {
+                      const avg = parseFloat(calculateAverage(grades));
+                      const maxGrade = 5;
+                      const percentage = (avg / maxGrade) * 100;
+
+                      return (
+                        <div key={subject} className="animate-fade-in" style={{ animationDelay: `${index * 80}ms` }}>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-medium text-sm">{subject}</span>
+                            <div className="flex items-center gap-2">
+                              <div className="flex gap-1">
+                                {grades.slice(-3).map((grade, i) => (
+                                  <Badge
+                                    key={i}
+                                    variant={grade >= 4 ? "default" : "destructive"}
+                                    className="w-6 h-6 flex items-center justify-center p-0 text-xs"
+                                  >
+                                    {grade}
+                                  </Badge>
+                                ))}
+                              </div>
+                              <Badge variant="outline" className="font-bold text-sm">
+                                {avg}
+                              </Badge>
+                            </div>
+                          </div>
+                          <div className="h-2 bg-muted rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all duration-1000 ${
+                                avg >= 4.5 ? "bg-green-500" : avg >= 3.5 ? "bg-primary" : "bg-destructive"
+                              }`}
+                              style={{ width: `${percentage}%` }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </Card>
+
+                <Card className="p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Icon name="Calendar" size={24} className="text-primary" />
+                    <h3 className="text-lg font-bold">Расписание на завтра</h3>
+                  </div>
+
+                  <div className="space-y-3">
+                    {mockStudentSchedule.map((lesson, index) => (
+                      <div
+                        key={lesson.id}
+                        className="p-3 border rounded-lg hover:bg-muted/50 transition-colors animate-fade-in"
+                        style={{ animationDelay: `${index * 50}ms` }}
+                      >
+                        <div className="flex items-start justify-between mb-1">
+                          <div className="font-semibold text-sm">{lesson.subject}</div>
+                          <Badge variant="outline" className="text-xs">{lesson.time}</Badge>
+                        </div>
+                        <div className="text-xs text-muted-foreground mb-2">
+                          Кабинет {lesson.room}
+                        </div>
+                        <div className="text-xs bg-muted p-2 rounded">
+                          <div className="flex items-start gap-1">
+                            <Icon name="FileText" size={12} className="mt-0.5 flex-shrink-0" />
+                            <span>{lesson.homework}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="contacts" className="space-y-4 animate-fade-in">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold">Контакты учителей</h2>
+                <Badge variant="outline">9А класс</Badge>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                {mockTeachers.map((teacher, index) => (
+                  <Card
+                    key={teacher.id}
+                    className="p-5 hover:shadow-md transition-shadow animate-fade-in"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                        <Icon name="User" size={24} className="text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold mb-1">{teacher.name}</h3>
+                        <p className="text-sm text-muted-foreground mb-3">{teacher.subject}</p>
+
+                        <div className="space-y-2">
+                          <a
+                            href={`tel:${teacher.phone}`}
+                            className="flex items-center gap-2 text-sm hover:text-primary transition-colors"
+                          >
+                            <Icon name="Phone" size={16} />
+                            <span>{teacher.phone}</span>
+                          </a>
+                          <a
+                            href={`mailto:${teacher.email}`}
+                            className="flex items-center gap-2 text-sm hover:text-primary transition-colors"
+                          >
+                            <Icon name="Mail" size={16} />
+                            <span>{teacher.email}</span>
+                          </a>
+                        </div>
+
+                        <Button variant="outline" size="sm" className="w-full mt-3">
+                          <Icon name="MessageCircle" size={16} className="mr-2" />
+                          Написать сообщение
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
         </main>
       </div>
     );
