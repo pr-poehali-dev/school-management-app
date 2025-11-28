@@ -45,8 +45,18 @@ const Index = () => {
   const [userRole, setUserRole] = useState<UserRole>(null);
   const [selectedSubject, setSelectedSubject] = useState("Математика");
   const [homework, setHomework] = useState("§12, №45-50");
+  const [selectedLoginRole, setSelectedLoginRole] = useState<UserRole>(null);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
-  if (!userRole) {
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (username && password) {
+      setUserRole(selectedLoginRole);
+    }
+  };
+
+  if (!userRole && !selectedLoginRole) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/30 to-background p-4">
         <Card className="w-full max-w-md p-8 shadow-xl animate-fade-in">
@@ -60,7 +70,7 @@ const Index = () => {
 
           <div className="space-y-3">
             <Button
-              onClick={() => setUserRole("teacher")}
+              onClick={() => setSelectedLoginRole("teacher")}
               className="w-full h-16 text-lg hover:scale-[1.02] transition-transform"
               variant="outline"
             >
@@ -68,7 +78,7 @@ const Index = () => {
               Учитель
             </Button>
             <Button
-              onClick={() => setUserRole("student")}
+              onClick={() => setSelectedLoginRole("student")}
               className="w-full h-16 text-lg hover:scale-[1.02] transition-transform"
               variant="outline"
             >
@@ -76,7 +86,7 @@ const Index = () => {
               Ученик
             </Button>
             <Button
-              onClick={() => setUserRole("parent")}
+              onClick={() => setSelectedLoginRole("parent")}
               className="w-full h-16 text-lg hover:scale-[1.02] transition-transform"
               variant="outline"
             >
@@ -84,6 +94,79 @@ const Index = () => {
               Родитель
             </Button>
           </div>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!userRole && selectedLoginRole) {
+    const roleLabels = {
+      teacher: "учителя",
+      student: "ученика",
+      parent: "родителя"
+    };
+
+    const roleIcons = {
+      teacher: "Users",
+      student: "BookOpen",
+      parent: "UserCircle"
+    };
+
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/30 to-background p-4">
+        <Card className="w-full max-w-md p-8 shadow-xl animate-fade-in">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setSelectedLoginRole(null);
+              setUsername("");
+              setPassword("");
+            }}
+            className="mb-4"
+          >
+            <Icon name="ArrowLeft" size={18} className="mr-2" />
+            Назад
+          </Button>
+
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-2xl mb-4">
+              <Icon name={roleIcons[selectedLoginRole] as any} size={32} className="text-primary" />
+            </div>
+            <h1 className="text-2xl font-bold mb-2">Вход для {roleLabels[selectedLoginRole]}</h1>
+            <p className="text-muted-foreground">Введите логин и пароль</p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Логин</label>
+              <Input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Введите логин"
+                required
+                className="h-12"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Пароль</label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Введите пароль"
+                required
+                className="h-12"
+              />
+            </div>
+
+            <Button type="submit" className="w-full h-12 text-lg">
+              <Icon name="LogIn" className="mr-2" size={20} />
+              Войти
+            </Button>
+          </form>
         </Card>
       </div>
     );
